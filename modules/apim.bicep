@@ -24,8 +24,25 @@ param sku string = 'Developer'
 ])
 param skuCount int = 1
 
+@description('Optional. The type of VPN in which API Management service needs to be configured in. None is the default Value.')
+@allowed([
+  'None'
+  'External'
+  'Internal'
+])
+param virtualNetworkType string = 'None'
+
+@description('Optional. The full resource ID of a subnet in a virtual network to deploy the API Management service in.')
+param subnetResourceId string = ''
+
 @description('Optional. Location for all resources.')
 param location string = resourceGroup().location
+
+@description('Optional. Set "Disabled" to disable the public access .')
+param publicNetworkStatus string = ''
+
+var isPublicNetworkDisabled = (publicNetworkStatus != '')
+
 
 resource apim 'Microsoft.ApiManagement/service@2022-04-01-preview' = {
   name: name
@@ -37,6 +54,9 @@ resource apim 'Microsoft.ApiManagement/service@2022-04-01-preview' = {
   properties: {
     publisherEmail: publisherEmail
     publisherName: publisherName
+    publicNetworkAccess: isPublicNetworkDisabled ? 'Disabled' : null
+    virtualNetworkType: virtualNetworkType
+    virtualNetworkConfiguration: !empty(subnetResourceId) ? json('{"subnetResourceId": "${subnetResourceId}"}') : null
   }
 }
 

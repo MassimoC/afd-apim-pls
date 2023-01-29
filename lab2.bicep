@@ -42,6 +42,7 @@ module apim 'modules/apim.bicep' = {
   params: {
     name: 'apim-${customerCode}'
     location:location
+    publicNetworkStatus: 'Disabled'
   }
 }
 
